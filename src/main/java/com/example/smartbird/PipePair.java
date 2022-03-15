@@ -15,6 +15,10 @@ public class PipePair {
     }
 
 
+    public double getGapY(){
+        return upper.getHeight();
+    }
+
     public void moveLeft(double amount)
     {
         upper.moveLeft(amount);

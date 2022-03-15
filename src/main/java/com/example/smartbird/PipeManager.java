@@ -7,7 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
-public class PipeManager
+public class PipeManager implements Runnable
 {
     private Random rand;
     private List<PipePair> list;
@@ -22,6 +22,7 @@ public class PipeManager
     private final double bottom;
     private final double acceleration;
     private double speed;
+    private boolean running;
 
 
     /**
@@ -52,6 +53,7 @@ public class PipeManager
 
         list = new LinkedList<>();
         timer = 0;
+        running = true;
     }
 
     private void createPipe()
@@ -59,6 +61,10 @@ public class PipeManager
         PipePair add = new PipePair(startX, rand.nextInt((int)(bottom-height-40)), width, height, Color.GREEN);
         list.add(add);
         add.addToPane(pane);
+    }
+
+    private void stop(){
+        running = false;
     }
 
     public void setSpeed(double speed) {
@@ -142,6 +148,13 @@ public class PipeManager
 
         }
         return res;
+    }
+
+    @Override
+    public void run() {
+        running = true;
+        while (running)
+            step();
     }
 
 

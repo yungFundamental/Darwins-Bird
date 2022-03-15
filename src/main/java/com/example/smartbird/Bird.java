@@ -18,6 +18,10 @@ public class Bird extends Circle
 
     }
 
+    public void setDead(){
+        alive = false;
+    }
+
     public void step() {
         setCenterY(getCenterY() + vel);
     }
@@ -57,5 +61,9 @@ public class Bird extends Circle
         // compare bottom of upper pipe and top of bird
         // (if  the following condition is met the objects collided, else they did not.)
         return p.getUpperPipe().getTranslateY() + p.getUpperPipe().getHeight() > this.getCenterY() - this.getRadius();
+    }
+
+    public boolean shouldJump(double []input){
+        return brain.forwardPropagation(input)[0] > 0.5;
     }
 }

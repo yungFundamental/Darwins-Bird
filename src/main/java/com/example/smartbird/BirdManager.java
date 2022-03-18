@@ -4,14 +4,16 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 public class BirdManager implements Runnable
 {
     private Pane pane;
-    private ArrayList<Bird> birds;
+    private LinkedList<Bird> aliveGeneration;    //the currently alive birds of the current generation
+    private LinkedList<Bird> deadGeneration;    //the dead birds of the current generation
     private PipeManager obstacles;
     private final double x;
-    private final int birdCount;
+    private final int generationSize;       //the amount of bird in one generation
     private final double radius;
     private final double floorY;
     private boolean running;
@@ -22,21 +24,42 @@ public class BirdManager implements Runnable
     private static final int MAX_BIRDS = colors.length;
     private static final int PARAMETERS_COUNT = 5;  // number of parameters for each neural network
 
+    private double min_weight;
+    private double max_weight;
+    private double min_bias;
+    private double max_bias;
 
-    public BirdManager(Pane pane, PipeManager pipeManager, double x, double floorY, double radius, int birdCount,
-                       double gravity, double maxPipeX) {
+
+    private Bird select() {
+        // the bird with the maximum score will have 100% chance to be selected.
+        Bird maxBird = deadGeneration.get(0);
+        for (Bird bird: deadGeneration){
+            if (maxBird.getScore() < bird.getScore())
+                maxBird = bird;
+        }
+        return maxBird;
+    }
+
+
+    public BirdManager(Pane pane, PipeManager pipeManager, double x, double floorY, double radius, int generationSize,
+                       double gravity, double maxPipeX, double min_weight, double max_weight, double min_bias, double max_bias) {
         this.pane = pane;
         obstacles = pipeManager;
         this.x = x;
         this.radius = radius;
         this.floorY = floorY;
-        this.birdCount = birdCount;
+        this.generationSize = generationSize;
         this.gravity = gravity;
         this.maxPipeX = maxPipeX;
 
+        this.min_weight = min_weight;
+        this.max_weight = max_weight;
+        this.min_bias = min_bias;
+        this.max_bias = max_bias;
+
         running = false;
-        birds = new ArrayList<>();
-        for (int i=0; i<birdCount; i++) {
+        aliveGeneration = new LinkedList<>();
+        for (int i = 0; i< generationSize; i++) {
             // input layer - 4 neurons (the parameters will be explained later)
             NeuralNetwork neuralNetwork = new NeuralNetwork(PARAMETERS_COUNT);
             // first hidden layer - 16 neurons, activation function is RelU
@@ -47,9 +70,11 @@ public class BirdManager implements Runnable
             // I used the sigmoid function because the answer should be between 0 and 1.
             neuralNetwork.addLayer(1, new Sigmoid());
             //randomize neural network:
-            neuralNetwork.randomize(-10,10,-10,10);
+            neuralNetwork.randomize(min_weight,max_weight,min_bias,max_bias);
 
-            birds.add(new Bird(x, floorY / 2, radius, Color.ORANGE,neuralNetwork));
+            Bird b = new Bird(x, floorY / 2, radius, colors[i],neuralNetwork);
+            aliveGeneration.add(b);
+            pane.getChildren().add(b);
         }
     }
 
@@ -62,19 +87,22 @@ public class BirdManager implements Runnable
         running = true;
         double[] input = new double[PARAMETERS_COUNT];
         while (running){
-            // for each alive bird
-            for(Bird mrBird: this.birds){
+            while (!aliveGeneration.isEmpty()) {
+                // for each alive bird
+                for (Bird mrBird : this.aliveGeneration) {
 
-                PipePair p;
-                // check for death
-                // p = the closest pipe (the only one possible for collision)
-                p = obstacles.getClosestRight(this.x-this.radius);
-                // if he collides with the pipe or hits the floor
-                if (p != null && (mrBird.checkCollision(p) || mrBird.getCenterY()+mrBird.getRadius() >= floorY))
-                    mrBird.setDead();
+                    PipePair p;
+                    // check for death
+                    // p = the closest pipe (the only one possible for collision)
+                    p = obstacles.getClosestRight(this.x - this.radius);
+                    // if he collides with the pipe or hits the floor
+                    if (p != null && (mrBird.checkCollision(p) || mrBird.getCenterY() + mrBird.getRadius() >= floorY)) {
+                        aliveGeneration.remove(mrBird);
+                        deadGeneration.add(mrBird);
+                        pane.getChildren().remove(mrBird);
+                    }
 
-                //for all alive birds
-                if (mrBird.isAlive()) {
+
                     //check neural network:
                     // get parameters
                     //param1: The birds Y coordinate
@@ -96,9 +124,19 @@ public class BirdManager implements Runnable
                     mrBird.accelerate(gravity);
                     mrBird.incScore();
                 }
+            }   //generation has perished
 
-
+            Bird fittest = select();
+            for (int i = 0; i<generationSize; i++) {
+                Bird child = new Bird(x, floorY / 2, radius, colors[i], fittest.getBrain());
+                child.mutate(0.1, min_weight,max_weight,min_bias,max_bias);
+                aliveGeneration.add(child);
+                pane.getChildren().add(child);
             }
+            deadGeneration.clear();
+
+
+
         }
     }
 }

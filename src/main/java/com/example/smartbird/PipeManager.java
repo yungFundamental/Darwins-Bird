@@ -150,6 +150,10 @@ public class PipeManager implements Runnable
         return res;
     }
 
+    public double getSpeed(){
+        return speed;
+    }
+
     @Override
     public void run() {
         running = true;

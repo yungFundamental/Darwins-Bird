@@ -6,7 +6,6 @@ import javafx.scene.shape.Circle;
 public class Bird extends Circle
 {
     private double vel;
-    private boolean alive;
     private final NeuralNetwork brain;
     private long score;
 
@@ -14,18 +13,17 @@ public class Bird extends Circle
     public Bird(double x, double y, double r, Color color, NeuralNetwork brain) {
         super(x,y,r,color);
         this.vel = 0;
-        alive = true;
         this.brain = brain;
         score = 0;
 
     }
 
-    public boolean isAlive(){
-        return alive;
+    public void mutate(double chance, double min_weight, double max_weight, double min_bias, double max_bias){
+        brain.mutate(chance, min_weight, max_weight, min_bias, max_bias);
     }
 
-    public void setDead(){
-        alive = false;
+    public NeuralNetwork getBrain() {
+        return new NeuralNetwork(brain);
     }
 
     public void step() {
@@ -40,6 +38,10 @@ public class Bird extends Circle
     }
     public void incScore(){
         score++;
+    }
+
+    public long getScore() {
+        return score;
     }
 
     public void setVelocity(double vel) {

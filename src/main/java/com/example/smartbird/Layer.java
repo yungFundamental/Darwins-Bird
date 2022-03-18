@@ -19,6 +19,17 @@ public class Layer
         this.activationFunc = activationFunction;
     }
 
+    public Layer(Layer other){
+        biases = other.getBiases();
+        weights = other.getWeights();
+        output = new double[other.getNeuronCount()];
+        this.activationFunc = other.getActivationFunc();
+    }
+
+    public ActivationFunction getActivationFunc() {
+        return activationFunc;
+    }
+
     public void setBias(int neuron, double val) {
         this.biases[neuron] = val;
     }

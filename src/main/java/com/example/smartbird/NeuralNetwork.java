@@ -13,6 +13,19 @@ public class NeuralNetwork
         this.parameters = parameters;
     }
 
+    public NeuralNetwork(NeuralNetwork other)
+    {
+        layers = new LinkedList<>();
+        this.parameters = getParameters();
+        // copy the list of layers of other to this.
+        for (Layer layer: other.layers)
+            this.layers.add(new Layer(layer));
+    }
+
+    public int getParameters() {
+        return parameters;
+    }
+
     public void addLayer(int neurons, ActivationFunction activationFunction){
         int inputSize = parameters;
         if(!layers.isEmpty())
@@ -36,14 +49,25 @@ public class NeuralNetwork
         return in;
     }
 
-    /** Create neural networks in image of a specific neural network.
-     *
-     * @param source The source neural network that the others will resemble.
-     * @param amount The amount of neural networks that will be returned.
-     * @return an array of neural networks that resemble the source.
-     */
-    public NeuralNetwork[] inImageOf(NeuralNetwork source, int amount){
-        return null;
-        //TODO insert code.
+
+    public void mutate(double chance, double min_weight, double max_weight, double min_bias, double max_bias) {
+        // each bias and weight has the specified chance to be replaced with a random value
+
+        for (Layer layer:this.layers){  // for each layer
+
+            double [][]weights = layer.getWeights();
+            for (int i = 0; i<weights.length; i++)
+                for (int j = 0; j<weights[0].length; j++)   // for each weight
+                    if (Math.random() <= chance)                // if the chance was met
+                        weights[i][j] = min_weight + (max_weight-min_weight) * Math.random();   //set as random value.
+            layer.setWeights(weights);
+
+            double []biases = layer.getBiases();
+            for (int i = 0; i<biases.length; i++)   //for each bias
+                if (Math.random() <= chance)            // if the chance was met
+                    biases[i] = min_bias + (max_bias-min_bias) * Math.random();
+            layer.setBiases(biases);
+        }
     }
+
 }

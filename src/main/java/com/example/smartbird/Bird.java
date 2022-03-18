@@ -8,6 +8,7 @@ public class Bird extends Circle
     private double vel;
     private boolean alive;
     private final NeuralNetwork brain;
+    private long score;
 
     // constructor to bird
     public Bird(double x, double y, double r, Color color, NeuralNetwork brain) {
@@ -15,7 +16,12 @@ public class Bird extends Circle
         this.vel = 0;
         alive = true;
         this.brain = brain;
+        score = 0;
 
+    }
+
+    public boolean isAlive(){
+        return alive;
     }
 
     public void setDead(){
@@ -31,6 +37,9 @@ public class Bird extends Circle
     public void accelerate(double a)
     {
         vel+=a;
+    }
+    public void incScore(){
+        score++;
     }
 
     public void setVelocity(double vel) {
@@ -61,6 +70,10 @@ public class Bird extends Circle
         // compare bottom of upper pipe and top of bird
         // (if  the following condition is met the objects collided, else they did not.)
         return p.getUpperPipe().getTranslateY() + p.getUpperPipe().getHeight() > this.getCenterY() - this.getRadius();
+    }
+
+    public double getVelocity(){
+        return vel;
     }
 
     public boolean shouldJump(double []input){

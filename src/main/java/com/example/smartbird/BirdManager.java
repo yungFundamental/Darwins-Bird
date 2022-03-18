@@ -20,7 +20,7 @@ public class BirdManager implements Runnable
     private static final Color[] colors = {Color.RED, Color.ORANGE, Color.YELLOW, Color.DARKGREY, Color.INDIANRED,
                                             Color.AQUA, Color.DARKTURQUOISE, Color.MISTYROSE, Color.LIGHTGOLDENRODYELLOW};
     private static final int MAX_BIRDS = colors.length;
-    private static final int PARAMETERS_COUNT = 4;  // number of parameters for each neural network
+    private static final int PARAMETERS_COUNT = 5;  // number of parameters for each neural network
 
 
     public BirdManager(Pane pane, PipeManager pipeManager, double x, double floorY, double radius, int birdCount,
@@ -73,18 +73,29 @@ public class BirdManager implements Runnable
                 if (p != null && (mrBird.checkCollision(p) || mrBird.getCenterY()+mrBird.getRadius() >= floorY))
                     mrBird.setDead();
 
-                //check neural network:
-                // get parameters
-                input[0] = mrBird.getCenterY();
-                input[1] = (p != null)? p.getX(): maxPipeX;
-                input[2] = (p != null)? p.getGapY(): 0;
-                input[3] = 0;       //Param 4
-                // check neuralNetwork
-                if(mrBird.shouldJump(input))
-                    mrBird.jump();
+                //for all alive birds
+                if (mrBird.isAlive()) {
+                    //check neural network:
+                    // get parameters
+                    //param1: The birds Y coordinate
+                    input[0] = mrBird.getCenterY();
+                    //param2: The closest pipes x coordinate
+                    input[1] = (p != null) ? p.getX() : maxPipeX;
+                    //param3: The Y of the closest gap.
+                    input[2] = (p != null) ? p.getGapY() : 0;
+                    //param4: The y velocity of the bird
+                    input[3] = mrBird.getVelocity();
+                    //param5: the x velocity of the pipes
+                    input[4] = obstacles.getSpeed();
 
-                mrBird.step();
-                mrBird.accelerate(gravity);
+                    // check neuralNetwork
+                    if (mrBird.shouldJump(input))
+                        mrBird.jump();
+
+                    mrBird.step();
+                    mrBird.accelerate(gravity);
+                    mrBird.incScore();
+                }
 
 
             }

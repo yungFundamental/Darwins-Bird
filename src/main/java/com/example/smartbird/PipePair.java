@@ -42,6 +42,18 @@ public class PipePair {
         p.getChildren().remove(this.lower);
     }
 
+    /** Request addition or removal from pane.
+     *
+     * @param handler The command handler.
+     * @param addition boolean value: true = to add; false = to remove.
+     */
+    public void request(CommandHandler handler, boolean addition)
+    {
+        handler.demand(getUpperPipe(), addition);
+        handler.demand(getLowerPipe(), addition);
+    }
+
+
     public Pipe getUpperPipe(){
         return new Pipe(this.upper);
     }

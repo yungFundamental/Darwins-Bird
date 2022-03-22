@@ -11,7 +11,7 @@ public class PipeManager implements Runnable
 {
     private Random rand;
     private List<PipePair> list;
-    private Pane pane;
+    private CommandHandler requestHandler;
 
     private int timer;
     private final int TIMER_RESET;
@@ -27,7 +27,7 @@ public class PipeManager implements Runnable
 
     /**
      *
-     * @param pane The pane where the pipes are drawn
+     * @param commandHandler a command handler to handle addition and removal of pipes.
      * @param maxX The maximum x coordinate of a pipe pair created. This is where each pipe pair will be initialized.
      * @param minX The minimum x coordinate of a pipe pair created. This is where each pipe pair will be deleted.
      * @param width Width of the pipes.
@@ -37,11 +37,11 @@ public class PipeManager implements Runnable
      * @param period How many frames between each creation of PipePairs.
      * @param acceleration The rate of acceleration of the pipes speed. Note: should be around 0.001.
      */
-    public PipeManager(Pane pane, int maxX, int minX, double width, double gapHeight, double initialSpeed, int bottom,
+    public PipeManager(CommandHandler commandHandler, int maxX, int minX, double width, double gapHeight, double initialSpeed, int bottom,
                        int period, double acceleration)
     {
         rand = new Random();
-        this.pane = pane;
+        this.requestHandler = commandHandler;
         this.startX = maxX;
         this.endX = minX;
         this.width = width;
@@ -60,7 +60,8 @@ public class PipeManager implements Runnable
     {
         PipePair add = new PipePair(startX, rand.nextInt((int)(bottom-height-40)), width, height, Color.GREEN);
         list.add(add);
-        add.addToPane(pane);
+        // add the pipe pair to the pane.
+        add.request(requestHandler, true);
     }
 
     private void stop(){
@@ -73,9 +74,13 @@ public class PipeManager implements Runnable
 
     public void clearList()
     {
+        System.out.println("preHola");
         for (PipePair p : this.list){
-            p.removeFromPane(pane);
+            //remove from pane.
+//            p.request(requestHandler, false);
+            System.out.println("hola");
         }
+        System.out.println("PostHola");
         list.clear();
 
     }
@@ -103,10 +108,9 @@ public class PipeManager implements Runnable
     {
         if (list.size() <= 0)
             return;
-        if (list.get(0).getX() <= endX){
-            pane.getChildren().remove(list.get(0).upper);
-            pane.getChildren().remove(list.get(0).lower);
-            list.remove(0);
+        if (list.get(0).getX() <= endX){    //if leftmost pipe pair is too left
+            list.get(0).request(requestHandler, false);     //request removal from pane
+            list.remove(0);                                   //remove from list
         }
 
     }

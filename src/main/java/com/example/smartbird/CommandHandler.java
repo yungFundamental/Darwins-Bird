@@ -1,18 +1,21 @@
 package com.example.smartbird;
 
+/*
+This class was created so that none javafx threads may access panes.
+ */
+
 import javafx.scene.Node;
-import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
 
 import java.util.LinkedList;
 import java.util.Queue;
 
-public class RequestQueue
+public class CommandHandler
 {
-    private Queue<ImageCommand> queue;
+    private final Queue<ImageCommand> queue;
     private final Pane pane;
 
-    public RequestQueue(Pane pane) {
+    public CommandHandler(Pane pane) {
         this.pane = pane;
         queue = new LinkedList<>();
     }

@@ -8,7 +8,7 @@ import java.util.LinkedList;
 
 public class BirdManager implements Runnable
 {
-    private Pane pane;
+    private final CommandHandler handler;       // handles addition and removal of birds to the pane.
     private ArrayList<Bird> aliveGeneration;    //the currently alive birds of the current generation
     private ArrayList<Bird> deadGeneration;    //the dead birds of the current generation
     private PipeManager obstacles;
@@ -32,9 +32,9 @@ public class BirdManager implements Runnable
 
 
 
-    public BirdManager(Pane pane, PipeManager pipeManager, double x, double floorY, double radius, int generationSize,
+    public BirdManager(CommandHandler commandHandler, PipeManager pipeManager, double x, double floorY, double radius, int generationSize,
                         double maxPipeX, double min_weight, double max_weight, double min_bias, double max_bias) {
-        this.pane = pane;
+        this.handler = commandHandler;
         obstacles = pipeManager;
         this.x = x;
         this.radius = radius;
@@ -65,7 +65,7 @@ public class BirdManager implements Runnable
 
             Bird b = new Bird(x, floorY / 2, radius, colors[i],neuralNetwork);
             aliveGeneration.add(b);
-            pane.getChildren().add(b);
+            handler.demand(b, true);
         }
     }
 
@@ -80,6 +80,13 @@ public class BirdManager implements Runnable
     }
     public void stop(){
         running = false;
+    }
+
+    public void step(double gravity){
+        for(Bird bird:this.aliveGeneration){
+            bird.accelerate(gravity);
+            bird.step();
+        }
     }
 
     @Override
@@ -100,7 +107,7 @@ public class BirdManager implements Runnable
                     if (p != null && (mrBird.checkCollision(p) || mrBird.getCenterY() + mrBird.getRadius() >= floorY)) {
                         aliveGeneration.remove(mrBird);
                         deadGeneration.add(mrBird);
-                        pane.getChildren().remove(mrBird);
+                        handler.demand(mrBird, false);
                     }
                     else {
 
@@ -119,11 +126,10 @@ public class BirdManager implements Runnable
                         input[4] = obstacles.getSpeed();
 
                         // check neuralNetwork
-                        if (mrBird.shouldJump(input))
+                        if (mrBird.shouldJump(input)) {
                             mrBird.jump();
+                        }
 
-                        mrBird.step();
-                        //                    mrBird.accelerate(gravity);
                         mrBird.incScore();
                     }
                 }
@@ -134,7 +140,7 @@ public class BirdManager implements Runnable
                 Bird child = new Bird(x, floorY / 2, radius, colors[i], fittest.getBrain());
                 child.mutate(0.1, min_weight,max_weight,min_bias,max_bias);
                 aliveGeneration.add(child);
-                pane.getChildren().add(child);
+                handler.demand(child, true);
             }
             deadGeneration.clear();
             obstacles.clearList();

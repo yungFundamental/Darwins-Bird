@@ -1,0 +1,4 @@
+.backgroundPane {
+     -fx-background-image: url('../../../src/main/resources/images/Sea&Mountains.jpg');
+    /*-fx-background-color: red;*/
+}

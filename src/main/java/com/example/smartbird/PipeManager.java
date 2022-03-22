@@ -101,12 +101,12 @@ public class PipeManager implements Runnable
      */
     public void pop()
     {
-        if (list.size() == 0)
+        if (list.size() <= 0)
             return;
         if (list.get(0).getX() <= endX){
             pane.getChildren().remove(list.get(0).upper);
             pane.getChildren().remove(list.get(0).lower);
-            list.remove(0).getX();
+            list.remove(0);
         }
 
     }

@@ -77,8 +77,8 @@ public class PipeManager implements Runnable
         System.out.println("preHola");
         for (PipePair p : this.list){
             //remove from pane.
-//            p.request(requestHandler, false);
-            System.out.println("hola");
+//            System.out.println(p.getX());
+            p.request(requestHandler, false);
         }
         System.out.println("PostHola");
         list.clear();

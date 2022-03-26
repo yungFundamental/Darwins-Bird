@@ -82,6 +82,10 @@ public class BirdManager implements Runnable
         running = false;
     }
 
+    /** execute scheduled tasks on every alive bird (move in accordance to speed, accelerate in accordance to gravity)
+     *
+     * @param gravity Acceleration value (larger the value, the more the speed increases downwards).
+     */
     public void step(double gravity){
         for(Bird bird:this.aliveGeneration){
             bird.accelerate(gravity);
@@ -107,7 +111,7 @@ public class BirdManager implements Runnable
                     if (p != null && (mrBird.checkCollision(p) || mrBird.getCenterY() + mrBird.getRadius() >= floorY)) {
                         aliveGeneration.remove(mrBird);
                         deadGeneration.add(mrBird);
-                        handler.demand(mrBird, false);
+                        handler.demand(mrBird, false);          // remove bird from pane.
                     }
                     else {
 

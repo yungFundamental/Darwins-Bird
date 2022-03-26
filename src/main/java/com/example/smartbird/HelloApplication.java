@@ -74,7 +74,7 @@ public class HelloApplication extends Application {
         menuScene.setOnKeyPressed(e-> {
             if (e.getCode() == SPACE) {
                 birdThread.start();
-                pipeThread.start();
+//                pipeThread.start();
                 timer.start();
                 switchScene(stage, gameScene);
             }
@@ -99,6 +99,8 @@ public class HelloApplication extends Application {
     public void physics(){
         handler.execute();
         birdManager.step(gravity);
+        // instead of pipe thread:
+        pipeManager.step();
     }
 
     public static void main(String[] args) {

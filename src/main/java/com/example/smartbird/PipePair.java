@@ -49,8 +49,8 @@ public class PipePair {
      */
     public void request(CommandHandler handler, boolean addition)
     {
-        handler.demand(getUpperPipe(), addition);
-        handler.demand(getLowerPipe(), addition);
+        handler.demand(this.upper, addition);
+        handler.demand(this.lower, addition);
     }
 
 
@@ -66,7 +66,7 @@ public class PipePair {
 
     public double getX()
     {
-        return upper.getTranslateX();
+        return upper.getX();
     }
 
     public static class Pipe extends Rectangle {
@@ -78,20 +78,20 @@ public class PipePair {
         public Pipe(Pipe o)
         {
             super(o.getWidth(), o.getHeight(), o.getFill());
-            this.setTranslateX(o.getTranslateX());
-            this.setTranslateY(o.getTranslateY());
+            this.setX(o.getX());
+            this.setY(o.getY());
         }
 
         public Pipe(double x, boolean isTop, double width, double height, Color color){
             super(width, height, color);
-            this.setTranslateX(x);
-            this.setTranslateY((isTop)?0:HelloApplication.S_HEIGHT-height);
+            this.setX(x);
+            this.setY((isTop)?0:HelloApplication.S_HEIGHT-height);
         }
 
 
         public void moveLeft(double amount)
         {
-            setTranslateX(getTranslateX()-amount);
+            setX(getX()-amount);
         }
 
 

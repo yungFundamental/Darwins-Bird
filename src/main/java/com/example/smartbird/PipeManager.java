@@ -22,6 +22,7 @@ public class PipeManager implements Runnable
     private final double bottom;
     private final double acceleration;
     private double speed;
+    private final double initialSpeed;
     private boolean running;
 
 
@@ -46,7 +47,7 @@ public class PipeManager implements Runnable
         this.endX = minX;
         this.width = width;
         this.height = gapHeight;
-        this.speed = initialSpeed;
+        this.initialSpeed = this.speed = initialSpeed;
         this.bottom = bottom;
         this.TIMER_RESET = period;
         this.acceleration = acceleration;
@@ -74,13 +75,10 @@ public class PipeManager implements Runnable
 
     public void clearList()
     {
-        System.out.println("preHola");
+        setSpeed(initialSpeed);
         for (PipePair p : this.list){
-            //remove from pane.
-//            System.out.println(p.getX());
             p.request(requestHandler, false);
         }
-        System.out.println("PostHola");
         list.clear();
 
     }

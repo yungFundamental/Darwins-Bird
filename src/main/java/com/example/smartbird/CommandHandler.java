@@ -30,13 +30,9 @@ public class CommandHandler
         }
         ImageCommand command = queue.remove();
         if (command.isAdd()) {
-//            if (command.getNode() instanceof Rectangle)
-//                System.out.println("Inserting rectangle.");
             pane.getChildren().add(command.getNode());
         }
         else {
-            if (command.getNode() instanceof Rectangle)
-                System.out.println("Rectangle found: " + pane.getChildren().contains(command.getNode()));
             pane.getChildren().remove(command.getNode());
         }
     }

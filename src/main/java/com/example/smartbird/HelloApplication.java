@@ -49,7 +49,7 @@ public class HelloApplication extends Application {
         menuText.setFont(new Font(89));
         pipeManager = new PipeManager(handler, S_WIDTH+100, -100, 65, 145, 4,
                 S_HEIGHT, 400, 0.001);
-        birdManager = new BirdManager(handler, pipeManager, 290, S_HEIGHT, 12, 4,
+        birdManager = new BirdManager(handler, pipeManager, 290, S_HEIGHT, 12, 10,
                 S_WIDTH+100, -10, 10,-10,10);
         birdThread = new Thread(birdManager);
         pipeThread = new Thread(pipeManager);

@@ -5,6 +5,7 @@ import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 public class BirdManager implements Runnable
 {
@@ -87,7 +88,8 @@ public class BirdManager implements Runnable
      * @param gravity Acceleration value (larger the value, the more the speed increases downwards).
      */
     public void step(double gravity){
-        for(Bird bird:this.aliveGeneration){
+        List<Bird> birdList = new ArrayList<>(this.aliveGeneration);
+        for(Bird bird: birdList){
             bird.accelerate(gravity);
             bird.step();
         }

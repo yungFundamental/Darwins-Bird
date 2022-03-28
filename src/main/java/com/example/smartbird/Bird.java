@@ -27,6 +27,11 @@ public class Bird extends Circle
     }
 
     public void step() {
+//        if (this.getCenterY() - this.getRadius() < 0)
+//        {
+//            this.vel = 0;
+//            return;
+//        }
         setCenterY(getCenterY() + vel);
     }
     public void jump() {
@@ -65,13 +70,13 @@ public class Bird extends Circle
         // Y AXIS:
         // compare top of lower pipe and bottom of bird
         //System.out.println("lower y: " + p.getLowerPipe().getY() + " bottom bird: " + (this.getCenterY() + this.getRadius()));
-        if (p.getLowerPipe().getTranslateY() < this.getCenterY() + this.getRadius())
+        if (p.getLowerPipe().getY() < this.getCenterY() + this.getRadius())
             return true;
 
 
         // compare bottom of upper pipe and top of bird
         // (if  the following condition is met the objects collided, else they did not.)
-        return p.getUpperPipe().getTranslateY() + p.getUpperPipe().getHeight() > this.getCenterY() - this.getRadius();
+        return p.getUpperPipe().getY() + p.getUpperPipe().getHeight() > this.getCenterY() - this.getRadius();
     }
 
     public double getVelocity(){

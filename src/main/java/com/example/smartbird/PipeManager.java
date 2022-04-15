@@ -57,7 +57,7 @@ public class PipeManager implements Runnable
         running = true;
     }
 
-    private void createPipe()
+    private synchronized void createPipe()
     {
         PipePair add = new PipePair(startX, rand.nextInt((int)(bottom-height-40)), width, height, Color.GREEN);
         list.add(add);
@@ -102,7 +102,7 @@ public class PipeManager implements Runnable
     /** check if the leftmost pipe is past the endX. If so, remove it.
      *
      */
-    public void pop()
+    public synchronized void pop()
     {
         if (list.size() <= 0)
             return;
@@ -131,14 +131,20 @@ public class PipeManager implements Runnable
         double minDis;
         PipePair res;
         double dis;
+//        List<PipePair> clone = new LinkedList<>(this.list);
+        List<PipePair> clone = this.list;
 
-        // impossibly large distance
-        minDis = startX - x + 1;
+        minDis = startX - x + 1;    // impossibly large distance
         res = null;
-        if (list.isEmpty())
+        if (clone.isEmpty())
             return null;
-        for (PipePair p: this.list)
+        for (int i = 0; i<this.list.size(); i++)
         {
+            PipePair p = list.get(i);
+            if (p==null) {
+                System.out.println("<======3");
+                continue;
+            }
             dis = p.getX() + p.getWidth() + -x;
             if (dis<0)
                 continue;

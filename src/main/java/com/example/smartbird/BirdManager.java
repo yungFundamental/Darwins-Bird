@@ -13,6 +13,10 @@ public class BirdManager implements Runnable
     private ArrayList<Bird> aliveGeneration;    //the currently alive birds of the current generation
     private ArrayList<Bird> deadGeneration;    //the dead birds of the current generation
     private PipeManager obstacles;
+    private long bestScore;
+    private int generationNumber;
+
+    // finals:
     private final double x;
     private final int generationSize;       //the amount of bird in one generation
     private final double radius;
@@ -31,17 +35,17 @@ public class BirdManager implements Runnable
 
 
 
-
-
     public BirdManager(CommandHandler commandHandler, PipeManager pipeManager, double x, double floorY, double radius, int generationSize,
                         double maxPipeX, double min_weight, double max_weight, double min_bias, double max_bias) {
         this.handler = commandHandler;
-        obstacles = pipeManager;
+        this.obstacles = pipeManager;
         this.x = x;
         this.radius = radius;
         this.floorY = floorY;
         this.generationSize = generationSize;
         this.maxPipeX = maxPipeX;
+        this.bestScore = 0;
+        this.generationNumber = 0;
 
         this.min_weight = min_weight;
         this.max_weight = max_weight;
@@ -70,6 +74,10 @@ public class BirdManager implements Runnable
         }
     }
 
+    /** Select a bird from the dead generation to be mutated. The score of each bird is their fitness and the bird
+     * with maximum fitness will be selected 100% of the time.
+     * @return Selected bird.
+     */
     private Bird select() {
         // the bird with the maximum score will have 100% chance to be selected.
         Bird maxBird = deadGeneration.get(0);
@@ -79,6 +87,10 @@ public class BirdManager implements Runnable
         }
         return maxBird;
     }
+
+    /** Stop the thread and genetic algorithm.
+     *
+     */
     public void stop(){
         running = false;
     }
@@ -95,6 +107,17 @@ public class BirdManager implements Runnable
         }
     }
 
+    public long getBestScore() {
+        return bestScore;
+    }
+
+    public int getGenerationNumber() {
+        return generationNumber;
+    }
+
+    /** execute the genetic algorithm while the "running" attribute is set to true.
+     *
+     */
     @Override
     public void run() {
         running = true;
@@ -117,7 +140,6 @@ public class BirdManager implements Runnable
                     }
                     else {
 
-
                         //check neural network:
                         // get parameters
                         //param1: The birds Y coordinate
@@ -136,20 +158,27 @@ public class BirdManager implements Runnable
                             mrBird.jump();
                         }
 
+                        // increase the current bird's score (survived another iteration)
                         mrBird.incScore();
+
+                        long score = mrBird.getScore();
+                        if (score > this.bestScore) // if the current score is above the best score
+                            this.bestScore = score;     // set current score as best score
                     }
                 }
             }   //generation has perished
 
             Bird fittest = select();
+            deadGeneration.clear();
+            obstacles.clearList();
             for (int i = 0; i<generationSize; i++) {
                 Bird child = new Bird(x, floorY / 2, radius, colors[i], fittest.getBrain());
                 child.mutate(0.1, min_weight,max_weight,min_bias,max_bias);
                 aliveGeneration.add(child);
                 handler.demand(child, true);
             }
-            deadGeneration.clear();
-            obstacles.clearList();
+            this.generationNumber++;
+
         }
     }
 }

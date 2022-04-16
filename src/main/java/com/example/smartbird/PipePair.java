@@ -11,7 +11,7 @@ public class PipePair {
     public PipePair(double x, double gapY, double width, double gapHeight, Color color)
     {
         upper = new Pipe(x, true, width, gapY, color);
-        lower = new Pipe(x, false, width, HelloApplication.S_HEIGHT - (gapY+gapHeight), color);
+        lower = new Pipe(x, false, width, GameManager.S_HEIGHT - (gapY+gapHeight), color);
     }
 
 
@@ -85,7 +85,7 @@ public class PipePair {
         public Pipe(double x, boolean isTop, double width, double height, Color color){
             super(width, height, color);
             this.setX(x);
-            this.setY((isTop)?0:HelloApplication.S_HEIGHT-height);
+            this.setY((isTop)?0:GameManager.S_HEIGHT-height);
         }
 
 

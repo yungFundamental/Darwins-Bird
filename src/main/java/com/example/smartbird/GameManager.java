@@ -15,7 +15,7 @@ import java.io.IOException;
 
 import static javafx.scene.input.KeyCode.SPACE;
 
-public class HelloApplication extends Application {
+public class GameManager extends Application {
     public final static int S_WIDTH = 960;
     public final static int S_HEIGHT = 540;
     private BackgroundImage bg;     // background image

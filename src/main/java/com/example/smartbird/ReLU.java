@@ -6,4 +6,14 @@ public class ReLU implements ActivationFunction
     public double activate(double val){
         return Math.max(0,val);
     }
+
+    /**
+     * Get the name of the activation function.
+     *
+     * @return The activation function name.
+     */
+    @Override
+    public String getName(){
+        return "ReLu";
+    }
 }

@@ -1,5 +1,7 @@
 package com.example.smartbird;
 
+import java.util.Arrays;
+
 /**
  * Note: this class represents hidden and output layers, but the input layer of the neural network will be represented
  * by a simple double array.
@@ -117,5 +119,21 @@ public class Layer
         // set all biases as random number between MIN_BIAS and MAX_BIAS
         for (int i=0; i<biases.length; i++)
             biases[i] = min_bias + (max_bias-min_bias) * Math.random();
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder mat = new StringBuilder("[");
+        for (double []arr: this.weights)
+            mat.append(Arrays.toString(arr)).append(',');
+        // remove last comma and replace with ']'
+        mat.deleteCharAt(mat.length()-1);
+        mat.append(']');
+
+        return "Layer{" +
+                "weights=" + mat +
+                ", biases=" + Arrays.toString(biases) +
+                ", activationFunc=" + activationFunc.getName() +
+                '}';
     }
 }

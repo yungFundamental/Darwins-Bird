@@ -1,5 +1,6 @@
 package com.example.smartbird;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 
 public class NeuralNetwork
@@ -13,14 +14,23 @@ public class NeuralNetwork
         this.parameters = parameters;
     }
 
+    /** Copy constructor.
+     *
+     * @param other The network to copy.
+     */
     public NeuralNetwork(NeuralNetwork other)
     {
         layers = new LinkedList<>();
-        this.parameters = getParameters();
+        this.parameters = other.getParameters();
         // copy the list of layers of other to this.
         for (Layer layer: other.layers)
             this.layers.add(new Layer(layer));
     }
+
+//    public NeuralNetwork(String str)
+//    {
+//        StringBuilder template = new StringBuilder("NeuralNetwork\nNumber of neurons: [")
+//    }
 
     public int getParameters() {
         return parameters;
@@ -70,4 +80,18 @@ public class NeuralNetwork
         }
     }
 
+    @Override
+    public String toString() {
+        StringBuilder temp = new StringBuilder("layers:\n[");
+        StringBuilder NeuronCounts = new StringBuilder("[" + this.parameters);
+
+        int i = 0;
+        for (Layer l:this.layers) {
+            temp.append("layer").append(i++).append(": ").append(l.toString()).append('\n');
+            NeuronCounts.append(",").append(l.getNeuronCount());
+        }
+        NeuronCounts.append(']');
+        temp.append(']');
+        return "NeuralNetwork {\nNumber_of_neurons: " + NeuronCounts + '\n' + temp + "\n}";
+    }
 }

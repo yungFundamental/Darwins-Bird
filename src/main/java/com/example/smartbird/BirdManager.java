@@ -3,6 +3,9 @@ package com.example.smartbird;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -57,7 +60,7 @@ public class BirdManager implements Runnable
         deadGeneration = new ArrayList<>();
         for (int i = 0; i< generationSize; i++) {
             // input layer - 4 neurons (the parameters will be explained later)
-            NeuralNetwork neuralNetwork = new NeuralNetwork(PARAMETERS_COUNT);
+            NeuralNetwork neuralNetwork = new NeuralNetwork(5); //PARAMETERS_COUnt
             // first hidden layer - 16 neurons, activation function is RelU
             neuralNetwork.addLayer(16, new ReLU());
             // second hidden layer - 16 neurons, activation function is RelU
@@ -73,6 +76,13 @@ public class BirdManager implements Runnable
             handler.demand(b, true);
         }
     }
+
+//    public BirdManager(CommandHandler commandHandler, PipeManager pipeManager, String filePath){
+//        this.handler = commandHandler;
+//        this.obstacles = pipeManager;
+//
+//
+//    }
 
     /** Select a bird from the dead generation to be mutated. The score of each bird is their fitness and the bird
      * with maximum fitness will be selected 100% of the time.
@@ -168,6 +178,7 @@ public class BirdManager implements Runnable
                 }
             }   //generation has perished
 
+
             Bird fittest = select();
             deadGeneration.clear();
             obstacles.clearList();
@@ -178,7 +189,72 @@ public class BirdManager implements Runnable
                 handler.demand(child, true);
             }
             this.generationNumber++;
+            this.save("saveFile" + generationNumber);
 
         }
+    }
+
+    /** Save the state of the bird manager and the birds it trained in order to continue training in later executions.
+     *
+     * @param fileName The name of the file or path of the file to save the brains into.
+     * @return true - saved the files. false - did not save the files.
+     */
+    public boolean save(String fileName) {
+        boolean status = true;
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));
+            int i = 0;
+            //add generation size
+            StringBuilder str = new StringBuilder("generationSize=");
+            str.append(this.generationSize);
+
+            //add x coordinate
+            str.append("\nx=").append(this.x);
+
+            //add generation number
+            str.append("\ngenerationNumber=").append(this.generationNumber);
+
+            //add best score
+            str.append("\nbestScore=").append(this.bestScore);
+
+            //add radius
+            str.append("\nradius=").append(this.radius);
+
+            //add maxPipeX
+            str.append("\nmaxPipeX=").append(this.maxPipeX);
+
+            //add floor y coordinate
+            str.append("\nfloorY=").append(this.floorY);
+
+            //add maximum bias
+            str.append("\nmax_bias=").append(this.max_bias);
+
+            //add minimum bias
+            str.append("\nmin_bias=").append(this.min_bias);
+
+            //add maximum weight
+            str.append("\nmax_weight=").append(this.max_weight);
+
+            //add minimum weight
+            str.append("\nmin_weight=").append(this.min_weight);
+
+            for (Bird bird:this.aliveGeneration) {
+                str.append("\n\nbird").append(++i).append(":\n");
+                str.append(bird.getBrain().toString());
+            }
+            for (Bird bird:this.deadGeneration) {
+                str.append("\n\nbird").append(++i).append(":\n");
+                str.append(bird.getBrain().toString());
+            }
+            writer.write(str.toString());
+            writer.close();
+        } catch (IOException e) {
+            System.out.println("Error saving!");
+            e.printStackTrace();
+            status = false;
+        }
+
+
+        return status;
     }
 }

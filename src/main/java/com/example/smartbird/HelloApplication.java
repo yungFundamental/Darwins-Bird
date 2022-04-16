@@ -80,12 +80,6 @@ public class HelloApplication extends Application {
             }
         });
 
-//        gameScene.setOnKeyPressed(keyEvent ->{
-//            if (keyEvent.getCode() == SPACE){
-//                //pause game
-//            }
-//        } );
-
         stage.setTitle("Darwin's Bird");
         stage.setScene(menuScene);
         stage.show();

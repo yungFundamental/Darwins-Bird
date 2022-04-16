@@ -7,4 +7,14 @@ public class Sigmoid implements ActivationFunction
     public double activate(double x) {
         return 1/(1+Math.exp(-x));
     }
+
+    /**
+     * Get the name of the activation function.
+     *
+     * @return The activation function name.
+     */
+    @Override
+    public String getName() {
+        return "Sigmoid";
+    }
 }

@@ -9,24 +9,24 @@ import java.util.Random;
 
 public class PipeManager implements Runnable
 {
-    private Random rand;
-    private List<PipePair> list;
-    private CommandHandler requestHandler;
+    private final Random rand;
+    private final List<PipePair> list;
+    private final CommandHandler requestHandler;
 
     private int timer;
     private final int TIMER_RESET;
     private final int startX;     // where the pipes will be created
     private final int endX;       // where the pipes will disappear
-    private double width;   //width of the pipes
+    private final double width;   //width of the pipes
     private final double height;  //height of the gap
-    private final double bottom;
-    private final double acceleration;
-    private double speed;
-    private final double initialSpeed;
+    private final double bottom;    //The y coordinate of the bottom of the screen.
+    private final double acceleration;  //The rate of acceleration of the pipes speed.
+    private double speed;       //current speed of the pipes
+    private final double initialSpeed;  //Initial speed of the pipes.
     private boolean running;
 
 
-    /**
+    /** Basic Constructor.
      *
      * @param commandHandler a command handler to handle addition and removal of pipes.
      * @param maxX The maximum x coordinate of a pipe pair created. This is where each pipe pair will be initialized.
@@ -128,26 +128,33 @@ public class PipeManager implements Runnable
      */
     public PipePair getClosestRight(double x)
     {
-        double minDis;
-        PipePair res;
+        double minDis;      //minimum distance.
+        PipePair res;       //the closest PipePair to the right of the x coordinate
         double dis;
-//        List<PipePair> clone = new LinkedList<>(this.list);
-        List<PipePair> clone = this.list;
 
+        //initialize the variables:
         minDis = startX - x + 1;    // impossibly large distance
         res = null;
-        if (clone.isEmpty())
+
+        if (this.list.isEmpty())
             return null;
+
+        // for each PipePair p in the list of pipes.
         for (int i = 0; i<this.list.size(); i++)
         {
             PipePair p = list.get(i);
             if (p==null) {
-                System.out.println("<======3");
+                System.out.println("<======3");     //shouldn't happen
                 continue;
             }
-            dis = p.getX() + p.getWidth() + -x;
+
+            // distance = right side of the pipe - x
+            dis = p.getX() + p.getWidth() - x;
+
+            // if the pipe is left to the given x
             if (dis<0)
                 continue;
+            // if the distance is smaller than minimum distance.
             if (dis<minDis)
             {
                 minDis = dis;

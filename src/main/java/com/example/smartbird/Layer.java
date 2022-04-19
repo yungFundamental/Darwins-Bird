@@ -8,7 +8,6 @@ import java.util.Arrays;
  */
 public class Layer
 {
-    private double[] input;         //the values of the neurons from the previous layer
     private double[] output;        //the values of the current neurons
     private double[][] weights;      //weight[i][j] = weight between neuron i in output and neuron j in input.
     private double[] biases;        //biases[i] = bias of neuron i in input
@@ -86,18 +85,23 @@ public class Layer
         return output.length;
     }
 
-    public void setInput(double[] input) {
-        this.input = input;
+    /**
+     *
+     * @return The amount of neurons in previous layer.
+     */
+    public int getInputCount() {
+        return weights[0].length;
     }
 
     public double[] getOutput() {
         return output.clone();
     }
 
-    /** forward propagation.
+    /** forward propagation. Calculate the value of the neurons.
      *
+     * @param input the values of the neurons in the previous layer. Size should be equal to the inputCount.
      */
-    public void calculateOutput(){
+    public void calculateOutput(double[] input){
         for (int i = 0; i < output.length; i++){
             output[i] = biases[i];
             for (int j = 0; j <  input.length; j++)

@@ -5,14 +5,14 @@ import javafx.scene.shape.Circle;
 
 public class Bird extends Circle
 {
-    private double vel;
+    private double velocity;
     private final NeuralNetwork brain;
     private long score;
 
     // constructor to bird
     public Bird(double x, double y, double r, Color color, NeuralNetwork brain) {
         super(x,y,r,color);
-        this.vel = 0;
+        this.velocity = 0;
         this.brain = brain;
         score = 0;
 
@@ -26,21 +26,31 @@ public class Bird extends Circle
         return new NeuralNetwork(brain);
     }
 
+    /** move in y coordinate accordance to current velocity.
+     *
+     */
     public void step() {
 //        if (this.getCenterY() - this.getRadius() < 0)
 //        {
 //            this.vel = 0;
 //            return;
 //        }
-        setCenterY(getCenterY() + vel);
+        setCenterY(getCenterY() + velocity);
     }
+
     public void jump() {
-        vel = -12;
+        velocity = -12;
     }
+
+    /** accelerate in the y-axis.
+     *
+     * @param a acceleration value.
+     */
     public void accelerate(double a)
     {
-        vel+=a;
+        velocity +=a;
     }
+
     public void incScore(){
         score++;
     }
@@ -50,9 +60,14 @@ public class Bird extends Circle
     }
 
     public void setVelocity(double vel) {
-        this.vel = vel;
+        this.velocity = vel;
     }
 
+    /** Check if the bird collided with pipePair p.
+     *
+     * @param p Pipe pair.
+     * @return True - collided, False - didn't collide.
+     */
     public boolean checkCollision(PipePair p)
     {
         // X AXIS:
@@ -80,7 +95,7 @@ public class Bird extends Circle
     }
 
     public double getVelocity(){
-        return vel;
+        return velocity;
     }
 
     public boolean shouldJump(double []input){

@@ -1,7 +1,7 @@
 package com.example.smartbird;
 
 /*
-This class was created so that none javafx threads may access panes.
+This class was created so that non-javafx-threads may access panes.
  */
 
 import javafx.scene.Node;
@@ -21,19 +21,29 @@ public class CommandHandler
         queue = new LinkedList<>();
     }
 
+    /** Add a ImageCommand to the queue.
+     *
+     * @param node The node to add/remove.
+     * @param toAdd true - add the node, false - remove the node.
+     */
     public void demand(Node node, boolean toAdd){
         queue.add(new ImageCommand(node, toAdd));
     }
+
+    /** Execute a command from the queue. If there are no commands, do nothing.
+     *
+     */
     public void execute(){
+        // if there are no commands to execute,
         if (queue.isEmpty()) {
+            // do nothing.
             return;
         }
+
+        // get the first command (first in)
         ImageCommand command = queue.remove();
-        if (command.isAdd()) {
-            pane.getChildren().add(command.getNode());
-        }
-        else {
-            pane.getChildren().remove(command.getNode());
-        }
+
+        // execute the command
+        command.execute(this.pane);
     }
 }

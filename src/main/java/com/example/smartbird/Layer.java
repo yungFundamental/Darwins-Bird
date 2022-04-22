@@ -1,5 +1,6 @@
 package com.example.smartbird;
 
+import java.lang.reflect.Array;
 import java.util.Arrays;
 
 /**
@@ -18,6 +19,13 @@ public class Layer
         biases = new double[neuronCount];
         weights = new double[neuronCount][inputCount];
         this.activationFunc = activationFunction;
+    }
+
+    private Layer(double[] biases, double[][] weights, ActivationFunction activationFunction){
+        this.biases = biases;
+        this.weights = weights;
+        this.activationFunc = activationFunction;
+        this.output = new double[biases.length];
     }
 
     public Layer(Layer other){
@@ -113,6 +121,10 @@ public class Layer
 
     /** Randomize all weights and biases and associated with this layer.
      *
+     * @param min_weight Minimum value for each weight.
+     * @param max_weight Maximum value for each weight.
+     * @param min_bias Minimum value for each bias.
+     * @param max_bias Maximum value for each bias.
      */
     public void randomize(double min_weight, double max_weight, double min_bias, double max_bias){
         // set all weights as random number between MIN_WEIGHT and MAX_WEIGHT
@@ -136,8 +148,50 @@ public class Layer
 
         return "Layer{" +
                 "weights=" + mat +
-                ", biases=" + Arrays.toString(biases) +
-                ", activationFunc=" + activationFunc.getName() +
+                ";biases=" + Arrays.toString(biases) +
+                ";activationFunc=" + activationFunc.getName() +
                 '}';
+    }
+
+    /** Converts string into a new instance of Layer.
+     *
+     * @param str The string. result of the toString function.
+     * @param inputCount The amount of neurons in the previous layer.
+     * @param neuronCount The amount of neurons in the current layer.
+     * @return The layer that was converted into the given string.
+     */
+    public static Layer fromString(String str, int inputCount, int neuronCount){
+        String[] split = str.split("[{}=;]", 0);
+        double[][] weights = new double[neuronCount][inputCount];
+        double[] bias = new double[neuronCount];
+        ActivationFunction function;
+        //split[0] = "layer2: Layer"
+        //split[1] = "weights"
+        //split[2] is the weight matrix in string format
+        String[] mat = split[2].split(",", 0);
+        for (int i = 0; i<neuronCount; i++)
+            for (int j=0; j<inputCount; j++)
+                weights[i][j] = Double.parseDouble(mat[i*inputCount + j].replaceAll("[\\[\\] ]", ""));
+
+        //split[3] = "biases"
+        //split[4] is the biases in string format
+        String[] arr = split[4].split(",",0);
+        for (int i = 0; i<neuronCount; i++)
+            bias[i] = Double.parseDouble(arr[i].replaceAll("[\\[\\] ]", ""));
+
+        //split[5] = "activationFunc"
+        //split[6] is the activation function name.
+        //get the activation function from the name.
+        switch (split[6]) {
+            case "ReLu" -> function = new ReLU();
+            case "Sigmoid" -> function = new Sigmoid();
+            case "Tanh" -> function = new Tanh();
+            default -> {
+                System.out.println("Unknown activation function...");
+                return null;
+            }
+        }
+
+        return new Layer(bias, weights, function);
     }
 }

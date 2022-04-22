@@ -1,5 +1,8 @@
 package com.example.smartbird;
 
+/**
+ * Tanh activation function.
+ */
 public class Tanh implements ActivationFunction
 {
     @Override

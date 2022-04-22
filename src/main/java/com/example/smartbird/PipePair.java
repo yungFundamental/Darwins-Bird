@@ -4,6 +4,9 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
+/**
+ * A pair of pipes, a top pipe one and a bottom pipe.
+ */
 public class PipePair {
     Pipe upper;
     Pipe lower;
@@ -69,6 +72,9 @@ public class PipePair {
         return upper.getX();
     }
 
+    /**
+     * Defines the class of pipes that are part of a pipePair.
+     */
     public static class Pipe extends Rectangle {
 
         /** Copy Constructor.

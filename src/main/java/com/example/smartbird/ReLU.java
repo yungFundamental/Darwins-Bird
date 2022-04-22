@@ -1,5 +1,8 @@
 package com.example.smartbird;
 
+/**
+ * ReLU activation function.
+ */
 public class ReLU implements ActivationFunction
 {
     @Override

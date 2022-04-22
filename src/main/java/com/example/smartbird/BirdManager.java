@@ -1,15 +1,14 @@
 package com.example.smartbird;
 
-import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
+/**
+ *  This class handles neuroevolution of birds on a specific pane.
+ */
 public class BirdManager implements Runnable
 {
     private final CommandHandler handler;       // handles addition and removal of birds to the pane.
@@ -19,25 +18,37 @@ public class BirdManager implements Runnable
     private long bestScore;
     private int generationNumber;
 
-    // finals:
-    private final double x;
-    private final int generationSize;       //the amount of bird in one generation
-    private final double radius;
-    private final double floorY;
+    private double x;
+    private double radius;
+    private double floorY;
     private boolean running;
-    private final double maxPipeX;      //the maximum x coordinate of a pipe.
+    private int generationSize;     //the amount of birds in a generation
+    private double maxPipeX;      //the maximum x coordinate of a pipe.
     private static final Color[] colors = {Color.RED, Color.ORANGE, Color.YELLOW, Color.DARKGREY, Color.INDIANRED,
                                             Color.AQUA, Color.DARKTURQUOISE, Color.MISTYROSE, Color.LIGHTGOLDENRODYELLOW,
                                             Color.FIREBRICK};
     private static final int PARAMETERS_COUNT = 5;  // number of parameters for each neural network
 
-    private final double min_weight;
-    private final double max_weight;
-    private final double min_bias;
-    private final double max_bias;
+    private double min_weight;
+    private double max_weight;
+    private double min_bias;
+    private double max_bias;
 
 
-
+    /** Basic constructor.
+     *
+     * @param commandHandler CommandHandler instance that is linked with the pane the birds will be drawn on.
+     * @param pipeManager Manages the obstacles of the bird.
+     * @param x The x coordinate of the birds.
+     * @param floorY The Y coordinate of the floor.
+     * @param radius Radius of the birds.
+     * @param generationSize Amount of birds in a generation.
+     * @param maxPipeX The maximum X coordinate of a pipe.
+     * @param min_weight Minimum value for each weight.
+     * @param max_weight Maximum value for each weight.
+     * @param min_bias Minimum value for each bias.
+     * @param max_bias Maximum value for each bias.
+     */
     public BirdManager(CommandHandler commandHandler, PipeManager pipeManager, double x, double floorY, double radius, int generationSize,
                         double maxPipeX, double min_weight, double max_weight, double min_bias, double max_bias) {
         this.handler = commandHandler;
@@ -58,6 +69,7 @@ public class BirdManager implements Runnable
         running = false;
         aliveGeneration = new ArrayList<>();
         deadGeneration = new ArrayList<>();
+        //create birds:
         for (int i = 0; i< generationSize; i++) {
             // input layer - 4 neurons (the parameters will be explained later)
             NeuralNetwork neuralNetwork = new NeuralNetwork(5); //PARAMETERS_COUnt
@@ -77,12 +89,108 @@ public class BirdManager implements Runnable
         }
     }
 
-//    public BirdManager(CommandHandler commandHandler, PipeManager pipeManager, String filePath){
-//        this.handler = commandHandler;
-//        this.obstacles = pipeManager;
-//
-//
-//    }
+    /** Import constructor - constructs from saveFile.
+     *
+     * @param commandHandler CommandHandler instance that is linked with the pane the birds will be drawn on.
+     * @param pipeManager Manages the obstacles of the bird.
+     * @param filePath The path to the file where the previous BirdManager saved its progress.
+     * @throws IOException Thrown in case of file error, file saved incorrectly, or more.
+     */
+    public BirdManager(CommandHandler commandHandler, PipeManager pipeManager, String filePath) throws IOException {
+        // create a reader that allows us to read the lines of the saveFile
+        BufferedReader reader = new BufferedReader(new FileReader(filePath));
+
+        this.handler = commandHandler;
+        this.obstacles = pipeManager;
+        running = false;
+        aliveGeneration = new ArrayList<>();
+        deadGeneration = new ArrayList<>();
+
+        this.generationSize = 0;
+
+        // read line
+        String line = reader.readLine();
+        //while there are lines to read:
+        while (line != null){
+            //split by words
+            String[] words = line.split("[ ]", 0);
+            switch (words[0]){
+                case "generationSize=":
+                    //generation size is calculated by amount of neural networks
+                    break;
+
+                case "x=":
+                    this.x = Double.parseDouble(words[1]);
+                    break;
+
+                case "generationNumber=":
+                    this.generationNumber = Integer.parseInt(words[1]);
+                    break;
+
+                case "bestScore=":
+                    this.bestScore = Long.parseLong(words[1]);
+                    break;
+
+                case "radius=":
+                    this.radius = Double.parseDouble(words[1]);
+                    break;
+
+                case "maxPipeX=":
+                    this.maxPipeX = Double.parseDouble(words[1]);
+                    break;
+
+                case "floorY=":
+                    this.floorY = Double.parseDouble(words[1]);
+                    break;
+
+                case "max_bias=":
+                    this.max_bias = Double.parseDouble(words[1]);
+                    break;
+
+                case "min_bias=":
+                    this.min_bias = Double.parseDouble(words[1]);
+                    break;
+
+                case "max_weight=":
+                    this.max_weight = Double.parseDouble(words[1]);
+                    break;
+
+                case "min_weight=":
+                    this.min_weight = Double.parseDouble(words[1]);
+                    break;
+
+                case "NeuralNetwork{":
+                    // get the neural network string
+                    StringBuilder networkString = new StringBuilder();
+                    line = reader.readLine();
+                    while (!line.equals("}")) {
+                        networkString.append(line).append('\n');
+                        line = reader.readLine();
+                    }
+                    //recreate the neural network
+                    NeuralNetwork net = NeuralNetwork.fromString(networkString.toString());
+
+                    // create a new bird with the brain we loaded.
+                    Bird bird = new Bird(this.x, this.floorY/2, this.radius, colors[generationSize++], net);
+
+                    //add to alive generation and draw
+                    aliveGeneration.add(bird);
+                    handler.demand(bird, true);
+                    break;
+
+                 default:
+                     System.out.println("word found: \"" + words[0] + "\"");
+                     throw new IOException();
+            }
+
+            // read next line
+            line = reader.readLine();
+        }
+
+        reader.close();
+
+    }
+
 
     /** Select a bird from the dead generation to be mutated. The score of each bird is their fitness and the bird
      * with maximum fitness will be selected 100% of the time.
@@ -189,7 +297,7 @@ public class BirdManager implements Runnable
                 handler.demand(child, true);
             }
             this.generationNumber++;
-            this.save("saveFile" + generationNumber);
+            this.save("saves\\saveFile" + generationNumber);
 
         }
     }
@@ -204,47 +312,48 @@ public class BirdManager implements Runnable
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));
             int i = 0;
-            //add generation size
-            StringBuilder str = new StringBuilder("generationSize=");
-            str.append(this.generationSize);
+            StringBuilder str = new StringBuilder();
+//            //add generation size
+//            StringBuilder str = new StringBuilder("generationSize= ");
+//            str.append(this.generationSize);
 
             //add x coordinate
-            str.append("\nx=").append(this.x);
+            str.append("x= ").append(this.x);
 
             //add generation number
-            str.append("\ngenerationNumber=").append(this.generationNumber);
+            str.append("\ngenerationNumber= ").append(this.generationNumber);
 
             //add best score
-            str.append("\nbestScore=").append(this.bestScore);
+            str.append("\nbestScore= ").append(this.bestScore);
 
             //add radius
-            str.append("\nradius=").append(this.radius);
+            str.append("\nradius= ").append(this.radius);
 
             //add maxPipeX
-            str.append("\nmaxPipeX=").append(this.maxPipeX);
+            str.append("\nmaxPipeX= ").append(this.maxPipeX);
 
             //add floor y coordinate
-            str.append("\nfloorY=").append(this.floorY);
+            str.append("\nfloorY= ").append(this.floorY);
 
             //add maximum bias
-            str.append("\nmax_bias=").append(this.max_bias);
+            str.append("\nmax_bias= ").append(this.max_bias);
 
             //add minimum bias
-            str.append("\nmin_bias=").append(this.min_bias);
+            str.append("\nmin_bias= ").append(this.min_bias);
 
             //add maximum weight
-            str.append("\nmax_weight=").append(this.max_weight);
+            str.append("\nmax_weight= ").append(this.max_weight);
 
             //add minimum weight
-            str.append("\nmin_weight=").append(this.min_weight);
+            str.append("\nmin_weight= ").append(this.min_weight);
 
             for (Bird bird:this.aliveGeneration) {
-                str.append("\n\nbird").append(++i).append(":\n");
-                str.append(bird.getBrain().toString());
+//                str.append("\n\nbird").append(++i).append(":\n");
+                str.append('\n').append(bird.getBrain().toString());
             }
             for (Bird bird:this.deadGeneration) {
-                str.append("\n\nbird").append(++i).append(":\n");
-                str.append(bird.getBrain().toString());
+//                str.append("\n\nbird").append(++i).append(":\n");
+                str.append('\n').append(bird.getBrain().toString());
             }
             writer.write(str.toString());
             writer.close();

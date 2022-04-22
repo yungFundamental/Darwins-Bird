@@ -37,6 +37,11 @@ public class NeuralNetwork
         layers.add(new Layer(inputSize, neurons, activationFunction));
     }
 
+    private void addLayer(Layer layer)
+    {
+        layers.add(layer);
+    }
+
     /** Set each weight and bias as a random value in a given range.
      *
      * @param min_weight Minimum value for each weight.
@@ -113,6 +118,41 @@ public class NeuralNetwork
         }
         NeuronCounts.append(']');
         temp.append(']');
-        return "NeuralNetwork {\nNumber_of_neurons: " + NeuronCounts + '\n' + temp + "\n}";
+        return "NeuralNetwork{\nNumber_of_neurons: " + NeuronCounts + '\n' + temp + "\n}";
+    }
+
+    /** Converts a toString of a neural network back into a neural network.
+     *
+     * @param str The resulting string of a toString function of a neural network instance.
+     * @return The neural network.
+     */
+    public static NeuralNetwork fromString(String str){
+        //split by lines
+        String[] lines = str.split("\n", 0);
+        NeuralNetwork res;
+        int lineNumber;
+
+        int[] number_of_neurons;
+        String[] strArr = lines[0].split("[\\[\\],]",0);
+
+        // fill the number of neurons array in accordance to the Number of neurons line (second line)
+        //string before '['  is not an element, therefore there are strArr.length-1 elements
+        number_of_neurons = new int[strArr.length-1];
+        for (int i=1; i< strArr.length; i++)
+            number_of_neurons[i-1] = Integer.parseInt(strArr[i]);
+
+        //parameters = the number of neurons in the first layer.
+        res = new NeuralNetwork(number_of_neurons[0]);
+
+        lineNumber = 2;     //the first line of a layer instance is at line 3 (index 2)
+        while (!lines[lineNumber].equals("]")){
+            Layer layer = Layer.fromString(lines[lineNumber], number_of_neurons[lineNumber-2],number_of_neurons[lineNumber-1]);
+            if (layer == null)
+                return null;
+            res.addLayer(layer);
+            lineNumber++;
+        }
+        return res;
     }
 }
+

@@ -32,7 +32,7 @@ public class Bird extends Circle
     public void step() {
 //        if (this.getCenterY() - this.getRadius() < 0)
 //        {
-//            this.vel = 0;
+//            this.velocity = -4;
 //            return;
 //        }
         setCenterY(getCenterY() + velocity);

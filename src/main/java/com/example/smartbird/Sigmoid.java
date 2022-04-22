@@ -1,5 +1,8 @@
 package com.example.smartbird;
 
+/**
+ * Sigmoid activation function.
+ */
 public class Sigmoid implements ActivationFunction
 {
 

@@ -59,7 +59,7 @@ public class GameManager extends Application {
                 case 1 -> {
                     //randomize neural networks:
                     birdManager = new BirdManager(handler, pipeManager, 290, SCREEN_HEIGHT, 12, 10,
-                            SCREEN_WIDTH + 100, -10, 10, -10, 10);
+                            SCREEN_WIDTH + 100,0.1, -10, 10, -10, 10);
                     selected = true;
                 }
                 case 2 -> {

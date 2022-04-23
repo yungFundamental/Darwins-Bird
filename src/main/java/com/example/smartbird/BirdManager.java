@@ -19,6 +19,7 @@ public class BirdManager implements Runnable
     private int generationNumber;
 
     private double x;
+    private double mutationChance;  //mutation rate/chance in each mutation (see mutation function in NeuralNetwork class)
     private double radius;
     private double floorY;
     private boolean running;
@@ -43,14 +44,16 @@ public class BirdManager implements Runnable
      * @param floorY The Y coordinate of the floor.
      * @param radius Radius of the birds.
      * @param generationSize Amount of birds in a generation.
+     * @param mutationChance The chance of each weight and bias to be random while mutating.
      * @param maxPipeX The maximum X coordinate of a pipe.
      * @param min_weight Minimum value for each weight.
      * @param max_weight Maximum value for each weight.
      * @param min_bias Minimum value for each bias.
      * @param max_bias Maximum value for each bias.
      */
-    public BirdManager(CommandHandler commandHandler, PipeManager pipeManager, double x, double floorY, double radius, int generationSize,
-                       double maxPipeX, double min_weight, double max_weight, double min_bias, double max_bias) {
+    public BirdManager(CommandHandler commandHandler, PipeManager pipeManager, double x, double floorY, double radius,
+                       int generationSize, double maxPipeX,
+                       double mutationChance, double min_weight, double max_weight, double min_bias, double max_bias) {
         this.handler = commandHandler;
         this.obstacles = pipeManager;
         this.x = x;
@@ -60,7 +63,7 @@ public class BirdManager implements Runnable
         this.maxPipeX = maxPipeX;
         this.bestScore = 0;
         this.generationNumber = 0;
-
+        this.mutationChance = mutationChance;
         this.min_weight = min_weight;
         this.max_weight = max_weight;
         this.min_bias = min_bias;
@@ -141,6 +144,10 @@ public class BirdManager implements Runnable
 
                 case "floorY=":
                     this.floorY = Double.parseDouble(words[1]);
+                    break;
+
+                case "mutationChance=":
+                    this.mutationChance = Double.parseDouble(words[1]);
                     break;
 
                 case "max_bias=":
@@ -299,7 +306,7 @@ public class BirdManager implements Runnable
                     // each new bird gets an identical brain to the selected bird...
                     Bird child = new Bird(x, floorY / 2, radius, colors[i], fittest.getBrain());
                     // but mutated with a chance of 10%
-                    child.mutate(0.1, min_weight, max_weight, min_bias, max_bias);
+                    child.mutate(mutationChance, min_weight, max_weight, min_bias, max_bias);
                     // add the bird to the next generation and draw on screen.
                     aliveGeneration.add(child);
                     handler.demand(child, true);
@@ -345,6 +352,9 @@ public class BirdManager implements Runnable
             //add floor y coordinate
             str.append("\nfloorY= ").append(this.floorY);
 
+            //add mutation chance
+            str.append("\nmutationChance= ").append(this.mutationChance);
+
             //add maximum bias
             str.append("\nmax_bias= ").append(this.max_bias);
 
@@ -358,11 +368,9 @@ public class BirdManager implements Runnable
             str.append("\nmin_weight= ").append(this.min_weight);
 
             for (Bird bird:this.aliveGeneration) {
-//                str.append("\n\nbird").append(++i).append(":\n");
                 str.append('\n').append(bird.getBrain().toString());
             }
             for (Bird bird:this.deadGeneration) {
-//                str.append("\n\nbird").append(++i).append(":\n");
                 str.append('\n').append(bird.getBrain().toString());
             }
             writer.write(str.toString());

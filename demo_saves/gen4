@@ -4,6 +4,7 @@ bestScore= 1162587
 radius= 12.0
 maxPipeX= 1060.0
 floorY= 540.0
+mutationChance= 0.1
 max_bias= 10.0
 min_bias= -10.0
 max_weight= 10.0

@@ -25,8 +25,8 @@ public class BirdManager implements Runnable
     private int generationSize;     //the amount of birds in a generation
     private double maxPipeX;      //the maximum x coordinate of a pipe.
     private static final Color[] colors = {Color.RED, Color.ORANGE, Color.YELLOW, Color.DARKGREY, Color.INDIANRED,
-                                            Color.AQUA, Color.DARKTURQUOISE, Color.MISTYROSE, Color.LIGHTGOLDENRODYELLOW,
-                                            Color.FIREBRICK};
+            Color.AQUA, Color.DARKTURQUOISE, Color.MISTYROSE, Color.LIGHTGOLDENRODYELLOW,
+            Color.FIREBRICK};
     private static final int PARAMETERS_COUNT = 5;  // number of parameters for each neural network
 
     private double min_weight;
@@ -50,7 +50,7 @@ public class BirdManager implements Runnable
      * @param max_bias Maximum value for each bias.
      */
     public BirdManager(CommandHandler commandHandler, PipeManager pipeManager, double x, double floorY, double radius, int generationSize,
-                        double maxPipeX, double min_weight, double max_weight, double min_bias, double max_bias) {
+                       double maxPipeX, double min_weight, double max_weight, double min_bias, double max_bias) {
         this.handler = commandHandler;
         this.obstacles = pipeManager;
         this.x = x;
@@ -178,9 +178,9 @@ public class BirdManager implements Runnable
                     handler.demand(bird, true);
                     break;
 
-                 default:
-                     System.out.println("word found: \"" + words[0] + "\"");
-                     throw new IOException();
+                default:
+                    System.out.println("word found: \"" + words[0] + "\"");
+                    throw new IOException();
             }
 
             // read next line
@@ -242,7 +242,7 @@ public class BirdManager implements Runnable
         double[] input = new double[PARAMETERS_COUNT];
         while (running){
 
-            while (!aliveGeneration.isEmpty()) {    // while the current generation is still alive
+            if (!aliveGeneration.isEmpty()) {    // while the current generation is still alive
                 // for each alive bird
                 for (int i = 0; i<this.aliveGeneration.size(); i++) {
                     Bird mrBird = aliveGeneration.get(i);
@@ -284,20 +284,30 @@ public class BirdManager implements Runnable
                             this.bestScore = score;     // set current score as best score
                     }
                 }
-            }   //generation has perished
-
-
-            Bird fittest = select();
-            deadGeneration.clear();
-            obstacles.clearList();
-            for (int i = 0; i<generationSize; i++) {
-                Bird child = new Bird(x, floorY / 2, radius, colors[i], fittest.getBrain());
-                child.mutate(0.1, min_weight,max_weight,min_bias,max_bias);
-                aliveGeneration.add(child);
-                handler.demand(child, true);
             }
-            this.generationNumber++;
-            this.save("saves\\saveFile" + generationNumber);
+
+            else { //generation has perished
+                // select a bird in accordance to the generations fitness
+                Bird fittest = select();
+                // discard the list of birds from the previous generation
+                deadGeneration.clear();
+                // start the game from the beginning
+                obstacles.clearList();
+
+                // create "generationSize" amount of birds
+                for (int i = 0; i < generationSize; i++) {
+                    // each new bird gets an identical brain to the selected bird...
+                    Bird child = new Bird(x, floorY / 2, radius, colors[i], fittest.getBrain());
+                    // but mutated with a chance of 10%
+                    child.mutate(0.1, min_weight, max_weight, min_bias, max_bias);
+                    // add the bird to the next generation and draw on screen.
+                    aliveGeneration.add(child);
+                    handler.demand(child, true);
+                }
+                this.generationNumber++;
+                // save the new generation
+                this.save("saves\\saveFile" + generationNumber);
+            }
 
         }
     }

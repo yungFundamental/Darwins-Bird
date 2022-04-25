@@ -1,6 +1,5 @@
 package com.example.smartbird;
 
-import java.lang.reflect.Array;
 import java.util.Arrays;
 
 /**

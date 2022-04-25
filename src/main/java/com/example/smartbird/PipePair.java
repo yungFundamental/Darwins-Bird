@@ -100,6 +100,5 @@ public class PipePair {
             setX(getX()-amount);
         }
 
-
     }
 }

@@ -1,6 +1,5 @@
 package com.example.smartbird;
 
-import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 
 import java.util.LinkedList;

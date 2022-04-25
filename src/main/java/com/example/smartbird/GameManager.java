@@ -34,12 +34,14 @@ public class GameManager extends Application {
 
     @Override
     public void start(Stage stage){
-
+        // create panes and command handler
         Pane gamePane = new Pane();
         Pane menuPane = new Pane();
         handler = new CommandHandler(gamePane);
+        // background image path
         bg = new BackgroundImage(new Image("file:src/main/resources/images/Sea&Mountains_scaled.jpg"),
                 BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT, BackgroundSize.DEFAULT);
+
         menuText = new Text(100, 100, "Press SPACE to start");
         menuText.setFont(new Font(89));
 
@@ -56,12 +58,14 @@ public class GameManager extends Application {
             // get the option from the user:
             int option = scanner.nextInt();
             switch (option) {
+                //random neural networks
                 case 1 -> {
                     //randomize neural networks:
                     birdManager = new BirdManager(handler, pipeManager, 290, SCREEN_HEIGHT, 12, 10,
                             SCREEN_WIDTH + 100,0.1, -10, 10, -10, 10);
                     selected = true;
                 }
+                //import from save file
                 case 2 -> {
                     // get path to save file from stdin:
                     System.out.println("Please enter the path to the save file to load (or \"back\" to return to menu):");
@@ -72,10 +76,8 @@ public class GameManager extends Application {
                     try {
                         birdManager = new BirdManager(handler, pipeManager, path);
                         selected = true;
-                        break;
                     } catch (IOException e) {   //if exception was met:
                         System.out.println("Error reading file...");
-                        break;
                     }
                 }
                 case 3 -> {
@@ -139,7 +141,7 @@ public class GameManager extends Application {
     public void physics(){
         handler.execute();
         birdManager.step(gravity);
-        // instead of pipe thread:
+        // instead of pipe thread, execute the pipeManagers job in this function:
         pipeManager.step();
     }
 

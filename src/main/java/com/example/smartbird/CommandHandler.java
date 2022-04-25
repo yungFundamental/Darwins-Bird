@@ -1,13 +1,10 @@
 package com.example.smartbird;
 
-
-
 import javafx.scene.Node;
 import javafx.scene.layout.Pane;
-import javafx.scene.shape.Rectangle;
-
 import java.util.LinkedList;
 import java.util.Queue;
+
 /**
  * This class was created so that non-javafx-threads may access panes.
  */

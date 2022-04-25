@@ -193,7 +193,9 @@ public class BirdManager implements Runnable
             // read next line
             line = reader.readLine();
         }
-
+        // the generationSize = the amount of birds (neural networks) found.
+        this.generationSize = this.aliveGeneration.size();
+        // close reader
         reader.close();
 
     }

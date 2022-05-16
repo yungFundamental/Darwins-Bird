@@ -1,6 +1,7 @@
 package com.example.smartbird;
 
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -17,6 +18,7 @@ public class BirdManager implements Runnable
     private PipeManager obstacles;
     private long bestScore;
     private int generationNumber;
+    private GenerationNumber genText;
 
     private double x;
     private double mutationChance;  //mutation rate/chance in each mutation (see mutation function in NeuralNetwork class)
@@ -50,10 +52,14 @@ public class BirdManager implements Runnable
      * @param max_weight Maximum value for each weight.
      * @param min_bias Minimum value for each bias.
      * @param max_bias Maximum value for each bias.
+     * @param textX X coordinate of the generation number text.
+     * @param textY Y coordinate of the generation number text.
+     * @param textFont Font size of the generation number text.
      */
     public BirdManager(CommandHandler commandHandler, PipeManager pipeManager, double x, double floorY, double radius,
                        int generationSize, double maxPipeX,
-                       double mutationChance, double min_weight, double max_weight, double min_bias, double max_bias) {
+                       double mutationChance, double min_weight, double max_weight, double min_bias, double max_bias,
+                       double textX, double textY, int textFont) {
         this.handler = commandHandler;
         this.obstacles = pipeManager;
         this.x = x;
@@ -90,6 +96,9 @@ public class BirdManager implements Runnable
             aliveGeneration.add(b);
             handler.demand(b, true);
         }
+        // add Text describing which generation we are on.
+        this.genText = new GenerationNumber(textX, textY, new Font(textFont), this.generationNumber, "Generation Number: ");
+        handler.demand(this.genText, true);
     }
 
     /** Import constructor - constructs from saveFile.
@@ -99,7 +108,8 @@ public class BirdManager implements Runnable
      * @param filePath The path to the file where the previous BirdManager saved its progress.
      * @throws IOException Thrown in case of file error, file saved incorrectly, or more.
      */
-    public BirdManager(CommandHandler commandHandler, PipeManager pipeManager, String filePath) throws IOException {
+    public BirdManager(CommandHandler commandHandler, PipeManager pipeManager, String filePath, double textX,
+                       double textY, int textFont) throws IOException {
         // create a reader that allows us to read the lines of the saveFile
         BufferedReader reader = new BufferedReader(new FileReader(filePath));
 
@@ -195,6 +205,9 @@ public class BirdManager implements Runnable
         }
         // the generationSize = the amount of birds (neural networks) found.
         this.generationSize = this.aliveGeneration.size();
+        // add Text describing which generation we are on.
+        this.genText = new GenerationNumber(textX, textY, new Font(textFont), this.generationNumber, "Generation Number: ");
+        handler.demand(this.genText, true);
         // close reader
         reader.close();
 
@@ -314,6 +327,7 @@ public class BirdManager implements Runnable
                     handler.demand(child, true);
                 }
                 this.generationNumber++;
+                this.genText.increment();
                 // save the new generation
                 this.save("saves\\saveFile" + generationNumber);
             }

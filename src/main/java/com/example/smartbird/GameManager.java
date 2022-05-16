@@ -62,7 +62,7 @@ public class GameManager extends Application {
                 case 1 -> {
                     //randomize neural networks:
                     birdManager = new BirdManager(handler, pipeManager, 290, SCREEN_HEIGHT, 12, 10,
-                            SCREEN_WIDTH + 100,0.1, -10, 10, -10, 10);
+                            SCREEN_WIDTH + 100,0.1, -10, 10, -10, 10, 30, 480, 20);
                     selected = true;
                 }
                 //import from save file
@@ -74,7 +74,7 @@ public class GameManager extends Application {
                         break;
                     }
                     try {
-                        birdManager = new BirdManager(handler, pipeManager, path);
+                        birdManager = new BirdManager(handler, pipeManager, path, 30, 480, 20);
                         selected = true;
                     } catch (IOException e) {   //if exception was met:
                         System.out.println("Error reading file...");
